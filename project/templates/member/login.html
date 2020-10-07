@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <script>
+        alert("{{messages[-1]}}");
+    </script>
+{% endif %}
+{% endwith %}
+
+
+<link rel="stylesheet" href="{{url_for('static', filename='css/signin.css')}}"> 
+<script>
+    function login_chk_form()
+    {
+        if($.trim($("#email").val()) == ""){
+            alert("이메일을 입력하세요!!");
+            $("#email").focus();
+            return false;
+        }
+
+        if(!validateEmail($.trim($("#email").val())))
+        {
+            alert("이메일 형식이 아닙니다. 다시 확인하세요!!");
+            $("#email").focus();
+            return false;
+        }
+
+        if($.trim($("#pw").val()) == ""){
+            alert("비밀번호를 입력하세요!!");
+            $("#pw").focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<div class="login-form text-center">
+    <form class="form-signin" action="{{url_for('member.member_login')}}" method="POST" name="form" onsubmit="return login_chk_form()">  
+        <h1 class="h3 mb-3 font-weight-normal">로그인</h1>
+        {% if next_url %}
+        <input type="hidden" name="next_url" value="{{next_url}}">
+        {% endif %}
+        <label for="email" class="sr-only">Email address</label>
+        <input type="email" name="email" id="email" class="form-control" placeholder="이메일" required>
+        <label for="pw" class="sr-only">Password</label>
+        <input type="password" name="pw" id="pw" class="form-control" placeholder="비밀번호" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">로그인</button>
+    </form>
+</div>
+
+{% endblock content %}

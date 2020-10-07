@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-xl">
+      <a class="navbar-brand" href="{{url_for('home')}}">LOGO</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07XL" aria-controls="navbarsExample07XL" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarsExample07XL">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link color-red" href="{{url_for('home')}}"> <span class="orange">Home</span>  <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="">게시판</a> -->
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown07XL" data-toggle="dropdown" aria-expanded="false">사용자</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown07XL">
+              {% if session["id"] %}
+                <a class="dropdown-item" href="#">나의 프로필</a>
+                <a class="dropdown-item" href="#">주문내역</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">로그아웃</a>
+              {% else %}
+                <a class="dropdown-item" href="#">회원가입</a>         
+                <a class="dropdown-item" href="#">로그인</a>
+              {% endif %}
+            </div>
+          </li>
+        </ul>
+        <form class="form-inline my-2 my-md-0">
+          <input class="form-control" type="text" placeholder="Search" aria-label="Search">
+        </form>
+      </div>
+    </div>
+  </nav>

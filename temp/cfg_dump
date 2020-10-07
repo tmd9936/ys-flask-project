@@ -1,0 +1,27 @@
+from datetime import timedelta
+import os
+
+
+# app.config["MONGO_URI"] = "mongodb://localhost:27017/hmbproj"
+
+# # 30분 동안 session 유지되는 환경설정(30분간 아무반응이 없으면 session값은 사라짐)
+# app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
+# # flash를 사용하게되면 SECRET_KEY를 사용해야한다.
+# app.config["SECRET_KEY"] = "some_key"
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+TOP_LEVEL_DIR = os.path.abspath(os.curdir)
+
+
+SECRET_KEY = 'some_key'
+DEBUG = True
+PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+MONGO_URI = "mongodb://localhost:27017/webproj"
+BOARD_IMAGE_PATH = "c:\\study\\images"
+ALLOWED_EXTENSIONS = set(["txt","pdf","png","jpg","jpeg","gif"])
+# 15MB
+MAX_CONTENT_LENGTH = 15 * 1024 * 1024
+
+
+if not os.path.exists(BOARD_IMAGE_PATH):
+    os.mkdir(BOARD_IMAGE_PATH)
