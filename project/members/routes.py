@@ -71,7 +71,7 @@ def member_login():
                 if next_url is not None:
                     return redirect(next_url)
                 else:
-                    return redirect(url_for('home'))
+                    return redirect(url_for('book.book_list'))
             else:
                 flash("비밀번호가 틀립니다.")
                 return render_template("member/login.html", title="로그인")
@@ -79,3 +79,9 @@ def member_login():
 
     else:
         return render_template("member/login.html", title="로그인")
+
+
+@members_blueprint.route("/logout", methods=['GET'])
+def logout():
+    session.clear()
+    return redirect(url_for("home"))

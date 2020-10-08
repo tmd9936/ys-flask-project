@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="{{url_for('static',filename='css/search_book.css')}}">
+
+<script>
+
+    var result_html = "";
+    var page = 1;
+    var search_complete = false;
+
+    function get_book_list() {
+        let scroll_position = Math.floor(($(window).scrollTop() / ($(document).height() - $(window).height())) * 100);
+        console.log(scroll_position);
+        if(!search_complete && scroll_position > 90) {
+            search();
+        }
+    }
+    
+    // 스크롤을 움직일때마다 해당 함수가 실행
+    $(window).scroll(get_book_list);
+
+    function search() {
+        search_str = $('#search_str').val();
+
+
+        $.ajax({
+            url:"{{url_for('book.book_search_result', search_str='search_str', page='page')}}".replace("search_str",search_str).replace("page",page),
+            cache: false,
+            contentType:"json",
+            type:"post",
+            success: function(args) {
+                for(let i=0; i<args.alt_list.length; i++)
+                {
+                    result_html += "\
+                        <tr>\
+                            <td>"+ args.url_list[i] +"</td>\
+                            <td><img src='"+args.src_list[i]+"' alt='Picture' width='95px'></td>\
+                            <td class='book_title'>"+ args.alt_list[i] +"</td>\
+                            <td><button class='btn btn-lg btn-success btn-join' type='button' onclick=''>등록</button></td>\
+                        </tr>\
+                    ";
+                }
+                $(".result").html(result_html);
+
+                if(args.alt_list.length <1){
+                    search_complete = true;
+                }
+                page++;
+            },
+            error: function(data){
+                console.log(data);
+                alert(data);
+            }
+    
+        });
+    }
+</script>
+<p></p>
+<img src="" alt="">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+        <div class="card card-sm">
+            <div class="card-body row no-gutters align-items-center">
+                <div class="col-auto">
+                    <i class="fas fa-search h4 text-body"></i>
+                </div>
+                <!--end of col-->
+                <div class="col">
+                    <input class="form-control form-control-lg form-control-borderless" type="search" id="search_str" placeholder="검색">
+                </div>
+                <!--end of col-->
+                <div class="col-auto">
+                    <button class="btn btn-lg btn-success" type="button" onclick="search()">Search</button>
+                </div>
+                <!--end of col-->
+            </div>
+        </div>
+    </div>
+    <!--end of col-->
+</div>
+
+<hr>
+<div>
+    <h3>검색 결과</h3>
+    <table class="table">
+        <thead>
+            <th>번호</th>
+            <th>이미지</th>
+            <th>제목</th>
+            <th>/</th>
+        </thead>
+        <tbody class="result">
+
+        </tbody>
+    </table>
+</div>
+<hr>
+
+{% endblock content %}

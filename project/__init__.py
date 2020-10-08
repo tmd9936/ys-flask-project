@@ -10,7 +10,9 @@ mongo = PyMongo(app)
 
 # 블루프린트 등록
 from .members import members_blueprint
+from .books import books_blueprint
 
 from . import routes
 
 app.register_blueprint(members_blueprint)
+app.register_blueprint(books_blueprint)

@@ -1,0 +1,17 @@
+.form-control-borderless {
+    border: none;
+}
+
+.form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.book_title {
+    text-align: center;
+}
+
+.btn-join {
+    text-align: center;
+}
