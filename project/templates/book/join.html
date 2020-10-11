@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .book_img {
+        width: 150px;
+    }
+</style>
+    <br>
+    <table class="table">
+        <tr>
+            <td width="160" rowspan="4"><img class="book_img" src="{{result.image}}" alt="book"></td>
+            <td><h3>{{result.name}}</h3></td>
+        </tr>
+        <tr>
+            <td>{{result.auth}}</td>
+        </tr>
+        <tr>
+            <td>{{result.publisher}}</td>
+        </tr>
+        <tr>
+            <td>{{result.date}}</td>
+        </tr>
+    </table>
+    {% for idx_str in result.indexes %}
+        <p>{{idx_str}}</p><br>
+    {% endfor %}
+{% endblock content %}

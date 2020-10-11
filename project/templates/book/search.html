@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script>
+            alert("{{messages[-1]}}");
+        </script>
+    {% endif %}
+{% endwith %}
 <link rel="stylesheet" href="{{url_for('static',filename='css/search_book.css')}}">
 
 <script>
@@ -7,21 +14,37 @@
     var result_html = "";
     var page = 1;
     var search_complete = false;
+    var search_wait = false;
 
+    function click_search_btn() {
+        result_html = "";
+        search();
+    }
+
+    // setTimeout(search, 5000)
     function get_book_list() {
         let scroll_position = Math.floor(($(window).scrollTop() / ($(document).height() - $(window).height())) * 100);
-        console.log(scroll_position);
-        if(!search_complete && scroll_position > 90) {
+        // console.log(scroll_position);
+        if(search_wait && scroll_position < 60)
+        {
+            search_wait = false
+        }
+        if(!search_complete && scroll_position > 90 && !search_wait) {
             search();
+            search_wait = true;
         }
     }
     
     // 스크롤을 움직일때마다 해당 함수가 실행
     $(window).scroll(get_book_list);
 
+    function move_join(param) {
+        location.href = "{{url_for('book.book_join', book_num = 'param')}}".replace("param", param);
+    }
+
+
     function search() {
         search_str = $('#search_str').val();
-
 
         $.ajax({
             url:"{{url_for('book.book_search_result', search_str='search_str', page='page')}}".replace("search_str",search_str).replace("page",page),
@@ -36,7 +59,7 @@
                             <td>"+ args.url_list[i] +"</td>\
                             <td><img src='"+args.src_list[i]+"' alt='Picture' width='95px'></td>\
                             <td class='book_title'>"+ args.alt_list[i] +"</td>\
-                            <td><button class='btn btn-lg btn-success btn-join' type='button' onclick=''>등록</button></td>\
+                            <td><button class='btn btn-lg btn-success btn-join' type='button' onclick='move_join("+ args.url_list[i]+")'>등록</button></td>\
                         </tr>\
                     ";
                 }
@@ -70,7 +93,7 @@
                 </div>
                 <!--end of col-->
                 <div class="col-auto">
-                    <button class="btn btn-lg btn-success" type="button" onclick="search()">Search</button>
+                    <button class="btn btn-lg btn-success" type="button" onclick="click_search_btn()">Search</button>
                 </div>
                 <!--end of col-->
             </div>
@@ -87,7 +110,7 @@
             <th>번호</th>
             <th>이미지</th>
             <th>제목</th>
-            <th>/</th>
+            <th>등록</th>
         </thead>
         <tbody class="result">
 
