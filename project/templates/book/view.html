@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .book_img {
+        width: 150px;
+    }
+</style>
+
+<table class="table">
+    <tr>
+        <td width="160" rowspan="4"><img class="book_img" src="{{book_info.image}}" alt="book"></td>
+        <td><h3>{{book_info.name}}</h3></td>
+    </tr>
+    <tr>
+        <td>{{book_info.auth}}</td>
+    </tr>
+    <tr>
+        <td>{{book_info.publisher}}</td>
+    </tr>
+    <tr>
+        <td>{{book_info.publish_date}}</td>
+    </tr>
+</table>
+
+<a class="btn btn-primary float-right" href="{{url_for('book.book_modify', member_id=session['id'], book_num=book_info.book_num)}}" >수정</a>
+<br><br>
+<hr>
+
+{% endblock content %}

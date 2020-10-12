@@ -1,6 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    .book-img{
+        width: 100px;
+    }
+    .book-info:hover {
+        background: silver;
+        cursor: pointer;
+    }
+</style>
+<script>
+    function book_view(book_id) {
+        //console.log(book_id);
+        location.href = "{{url_for('book.book_view', book_id='bookid')}}".replace("bookid", book_id);
+    }
+</script>
 <h1>책장</h1>
+<table class="table">
+    <thead>
+        <th>이미지</th>
+        <th>이름</th>
+        <th>마지막수정</th>
+        <th>진행도</th>
+        <th>/</th>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr class="book-info" onclick="book_view('{{book._id}}')">
+            <td><img class="book-img" src="{{book.image}}" alt="book"></td>
+            <td>{{book.name}}</td>
+            <td>{{book.last_modify | datetime_format}}</td>
+            <td>{{book.per_all_study}}%</td>
+            <td><input class="btn btn-danger" type="button" value="삭제"></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <h1>1회독 2회독</h1>
-<h1>버튼이랑 키이벤트로 목차 정리</h1>
 {% endblock content%}

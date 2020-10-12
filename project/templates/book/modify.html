@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/book_modify.css')}}">
+    <script>
+        function depth_up(id) {
+            // $(id).attr("depth")
+            console.log($(id).attr("depth"));
+        }
+
+        function depth_down(id) {
+            console.log(id);
+        }
+    </script>
+
+    <br>
+    <table class="table">
+        <tr>
+            <td width="160" rowspan="4"><img class="book_img" src="{{book_info.image}}" alt="book"></td>
+            <td><h3>{{book_info.name}}</h3></td>
+        </tr>
+        <tr>
+            <td>{{book_info.auth}}</td>
+        </tr>
+        <tr>
+            <td>{{book_info.publisher}}</td>
+        </tr>
+        <tr>
+            <td>{{book_info.publish_date}}</td>
+        </tr>
+    </table>
+    <div>
+        <div>
+            <p>마지막 수정시간 : {{book_info.last_modify | datetime_format}}</p>
+        </div>
+        <div>
+            <p>전체 공부 진척도 : {{book_info.per_all_study}}</p>
+        </div>
+    </div>
+    <form action="{{url_for('book.book_modify',member_id=book_info.member_id, book_num=book_num)}}" name="form" method="post">
+        {% for index in book_indexes %}
+            <div class="input-group index-group">
+                <input type="text" id="index_{{index.num}}" depth="{{index.depth}}" class="form-control depth-{{index.depth}}" placeholder="목차" name="book_index" value="{{index.name}}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">삭제</button>
+                    <button class="btn btn-outline-secondary" type="button">추가</button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="depth_up('index_{{index.num}}')">◀</button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="depth_down('index_{{index.num}}')">▶</button>
+                </div>
+            </div>
+        {% endfor %}
+        <br>
+        <input class="btn btn-primary float-right" type="submit" value="수정">
+    </form>
+        <br><br>
+        <hr>
+        <!-- <p>{{idx_str}}</p><br> -->
+{% endblock content %}
