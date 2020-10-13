@@ -2,9 +2,11 @@
 {% block content %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/book_modify.css')}}">
     <script>
-        var load_index_cnt = Number("{{book_indexes.count()}}");
-        var add_index_cnt = 0;
+        // var load_index_cnt = Number("{{book_indexes.count()}}");
+        var load_index_cnt = 0;
+        var add_index_cnt = 1;
         $(function() {
+            load_index_cnt = Number($("#sortable li:last-child div .form-control").attr('id').replace("index_", ""));
             $("#sortable").sortable({
                 // update: function( event, ui ){
                 //     let index_input = $("#sortable .form-control").toArray();
@@ -51,6 +53,25 @@
         }
 
         function delete_index(id) {
+            
+            let index_id = $(id).prev().attr("value");
+            console.log(index_id);
+
+            if (index_id != null && index_id != ""){
+                $.ajax({
+                    url:"{{url_for('book.delete_index', index_id='indexid')}}".replace("indexid", index_id),
+                    cache:false,
+                    contentType:"json",
+                    type:"post",
+                    success: function(args) {
+                        alert("삭제되었습니다.");
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    }
+                });
+            }
+
             $(id).parent().parent().remove();
         }
 
@@ -70,6 +91,7 @@
             $(item).appendTo("#sortable");
 
             add_index_cnt += 1;
+            //reorder()
         }
 
         function submit_chk() {

@@ -153,3 +153,17 @@ def book_modify(member_id, book_num):
             # print(indexes)
 
             return redirect(url_for('book.book_view', book_id=book_id))
+
+@books_blueprint.route("/delete/index/<index_id>", methods=["POST"])
+@login_required
+def delete_index(index_id):
+    if index_id != "" and index_id is not None:
+        indexes_db = mongo.db.indexes
+        result = indexes_db.delete_one({"_id":ObjectId(index_id)})
+        
+        resp = jsonify(success=True)
+        resp.status_code = 200
+        
+        return resp
+    else:
+        return jsonify({'error': 'This is not index id'}), 401

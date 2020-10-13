@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask import render_template, request, url_for
 from flask import url_for, redirect, flash, session, abort
+from flask import jsonify
 
 from flask_pymongo import ObjectId
 
