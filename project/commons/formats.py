@@ -24,3 +24,13 @@ def datetime_format(value):
     value = datetime.fromtimestamp((int(value) / 1000)) + offset_time
 
     return value.strftime("%Y-%m-%d %H:%M:%S")
+
+# @app.template_filter("length")
+# def length(value):
+    
+#     if value is None :
+#         return ""
+
+#     return 
+
+    

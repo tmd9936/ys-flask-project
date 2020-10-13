@@ -106,13 +106,50 @@ def book_modify(member_id, book_num):
             book_db = mongo.db.book
             indexes_db = mongo.db.indexes
 
-            print(member_id, book_num)
+            # print(member_id, book_num)
 
             book_info = book_db.find_one({"member_id":member_id, "book_num":book_num})
             book_id = book_info.get("_id")
 
-            book_indexes = indexes_db.find({"member_id":member_id, "book_id":book_id})
+            book_indexes = indexes_db.find({"member_id":member_id, "book_id":book_id}).sort("num")
 
-            return render_template("book/modify.html",title=book_info.get("book_name"), book_info=book_info, book_indexes= book_indexes)
+            return render_template("book/modify.html",title=book_info.get("name"), book_info=book_info, book_indexes= book_indexes)
         else:
-            pass
+            indexes_db = mongo.db.indexes
+            
+            book_id = request.form.get('book_id')
+            depthes = request.form.getlist('depth')
+            index_ids = request.form.getlist('index_id')
+            indexes = request.form.getlist('book_index')
+
+            for e_idx in range(0, len(indexes)):
+                
+                if index_ids[e_idx] == "" or index_ids[e_idx] is None:
+                    current_utc_time = round(datetime.utcnow().timestamp()* 1000)
+                    
+                    indexes = dict()
+                    indexes["book_id"] = book_id
+                    indexes["member_id"] = member_id
+                    indexes["name"] = indexes[e_idx]
+                    indexes["per_study"] = 0
+                    indexes["depth"] = depthes[e_idx]
+                    indexes["num"] = e_idx
+                    indexes["latest_date"] = current_utc_time
+
+                    indexes_db.insert_one(indexes)
+                else:
+                    indexes_db.update({"_id":ObjectId(index_ids[e_idx])},
+                    {"$set": 
+                        {
+                            "depth":depthes[e_idx],
+                            "num":e_idx,
+                            "name":indexes[e_idx]
+                        }
+                    })
+
+
+            # print(depthes)
+            # print(index_ides)
+            # print(indexes)
+
+            return redirect(url_for('book.book_view', book_id=book_id))

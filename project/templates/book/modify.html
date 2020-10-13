@@ -2,14 +2,89 @@
 {% block content %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/book_modify.css')}}">
     <script>
+        var load_index_cnt = Number("{{book_indexes.count()}}");
+        var add_index_cnt = 0;
+        $(function() {
+            $("#sortable").sortable({
+                // update: function( event, ui ){
+                //     let index_input = $("#sortable .form-control").toArray();
+                //     let num = 0;
+                //     index_input.forEach(ii => {
+                        
+                //         num++;
+                //     });
+                // }
+            });
+            $("#sortable").disableSelection();
+            
+        });
+        
         function depth_up(id) {
-            // $(id).attr("depth")
-            console.log($(id).attr("depth"));
+            //console.log($(id).attr("depth"));
+  
+            depth = Number($(id).prev().prev().attr("value"));
+            
+
+            if (depth >= 2){
+                return;
+            } else {
+                $(id).removeClass("depth-"+depth);
+                $(id).addClass("depth-"+(depth+1));
+                $(id).prev().prev().attr("value", depth+1);
+            }
         }
 
         function depth_down(id) {
-            console.log(id);
+            //console.log($(id).attr("depth"));
+            
+            depth = Number($(id).prev().prev().attr("value"));
+
+
+            if (depth <= 0) {
+                return;
+            } else {
+                $(id).removeClass("depth-"+depth);
+                $(id).addClass("depth-"+(depth-1));
+                $(id).prev().prev().attr("value", depth-1);
+            }
+
         }
+
+        function delete_index(id) {
+            $(id).parent().parent().remove();
+        }
+
+        function create_index() {
+            var item = '<li class="ui-state-default ui-sortable-handle"> \
+                    <div class="input-group index-group">\
+                        <input type="hidden" class="depth" name="depth" value="0">\
+                        <input type="hidden" class="id" name="id">\
+                        <input type="text" id="index_'+ (load_index_cnt + add_index_cnt) +'" depth="0" class="form-control depth-'+ (load_index_cnt + add_index_cnt) +'" placeholder="목차" name="book_index" value="">\
+                        <div class="input-group-append">\
+                            <button class="btn btn-outline-secondary" type="button" onclick="delete_index(\'#index_'+ (load_index_cnt + add_index_cnt) +'\')">Del</button>\
+                            <button class="btn btn-outline-secondary" type="button" onclick="depth_down(\'#index_'+ (load_index_cnt + add_index_cnt) +'\')">◀</button>\
+                            <button class="btn btn-outline-secondary" type="button" onclick="depth_up(\'#index_'+ (load_index_cnt + add_index_cnt) +'\')">▶</button>\
+                        </div>\
+                    </div> \
+                </li>';
+            $(item).appendTo("#sortable");
+
+            add_index_cnt += 1;
+        }
+
+        function submit_chk() {
+            let indexex = $("[name=book_index]");
+
+            for (const index of indexex) {
+                if ($(index).val() == ""){
+                    alert("값이 빈 목차가 있습니다.");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     </script>
 
     <br>
@@ -36,22 +111,32 @@
             <p>전체 공부 진척도 : {{book_info.per_all_study}}</p>
         </div>
     </div>
-    <form action="{{url_for('book.book_modify',member_id=book_info.member_id, book_num=book_num)}}" name="form" method="post">
-        {% for index in book_indexes %}
-            <div class="input-group index-group">
-                <input type="text" id="index_{{index.num}}" depth="{{index.depth}}" class="form-control depth-{{index.depth}}" placeholder="목차" name="book_index" value="{{index.name}}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">삭제</button>
-                    <button class="btn btn-outline-secondary" type="button">추가</button>
-                    <button class="btn btn-outline-secondary" type="button" onclick="depth_up('index_{{index.num}}')">◀</button>
-                    <button class="btn btn-outline-secondary" type="button" onclick="depth_down('index_{{index.num}}')">▶</button>
-                </div>
-            </div>
-        {% endfor %}
+    <form action="{{url_for('book.book_modify',member_id=book_info.member_id, book_num=book_info.book_num)}}" name="form" method="POST" onsubmit="return submit_chk()">
+        <input class="btn btn-primary" type="submit" value="수정">
+        <input type="hidden" name="book_id" id="book_id" value="{{book_info._id}}">
+        
+        <ul id="sortable">
+            {% for index in book_indexes %}
+                <li class="ui-state-default">
+                    <div class="input-group index-group">
+                        <input type="hidden" class="depth" name="depth" value="{{index.depth}}">
+                        <input type="hidden" class="index-id" name="index_id" value="{{index._id}}">
+                        <input type="text" id="index_{{index.num}}" class="form-control depth-{{index.depth}}" placeholder="목차" name="book_index" value="{{index.name}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="delete_index('#index_{{index.num}}')">Del</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="depth_down('#index_{{index.num}}')">◀</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="depth_up('#index_{{index.num}}')">▶</button>
+                        </div>
+                    </div> 
+                </li>
+            {% endfor %}
+        </ul>
+        <br><br>
+        <input class="btn btn-dark float-right" type="button" value="추가" onclick="create_index()">
         <br>
-        <input class="btn btn-primary float-right" type="submit" value="수정">
     </form>
         <br><br>
         <hr>
         <!-- <p>{{idx_str}}</p><br> -->
+        
 {% endblock content %}
