@@ -1,10 +1,98 @@
 {% extends 'base.html' %}
 {% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/book_modify.css')}}">
+
 <style>
-    .book_img {
-        width: 150px;
+    .progress {
+        background-color: #cccccc;
+    }
+    .progress-bar {
+        background-color: #bbbbbb;
+    }
+    .index-str {
+        margin-left: 5px;
+        font-weight: bold;
+        font-size: medium;
+        /* position: absolute; */
+        margin-top: 13px;
+    }
+    .index-str-r {
+        font-weight: bold;
+        font-size: medium;
+        /* position: absolute; */
+        margin-top: 13px;       
+    }
+    .index-str-box {
+        position: absolute;
+        display: flex;
+        -webkit-justify-content: space-between;
+        justify-content: space-between;
+        flex-direction:row;
     }
 </style>
+
+<script>
+    $(document).ready(function(){
+
+        $(".progress").on("click", function(e) {
+            // 내가 클릭한 곳의 X좌표
+            let startX = e.clientX;
+
+            // 해당 돔의 길이
+            let dom_width = $(this).innerWidth();
+
+            // 해당 돔의 왼쪽 좌표
+            let dom_position = $(this).position().left;
+
+            let depth = $(this).children("[name='depth']").val();
+            let click_position = (startX-dom_position);
+            let m_left = $(this).css("margin-left");
+            m_left = Number(m_left.replace("px", ""));
+
+            if (depth !='0')
+                click_position -= m_left;
+            let per = Math.round(click_position / dom_width *100);
+            
+            // 프로그래스바 길이 조정
+            $(this).children('.progress-bar').css("width", per+"%");
+            // 선택된 목차의 퍼센트 값 조정
+            $(this).children('.index-str-box').children('.index-str-r')
+                                    .children('.per-study').text(Math.round(per));
+
+            // 전체 진행도 계산
+            let pers = $("[name='per-study']");
+            let sum_per = 0;
+            for (const per of pers) {
+                sum_per += Number($(per).text());
+                
+            }
+
+            let index_id = $(this).children('.index-id').val();
+            let per_all_study = Math.round(sum_per/pers.length)
+            
+            // 전체 진행도 표시
+            $("#all-per-study").html("<b>전체 진행도 : " + per_all_study + "%</b>");
+            $.ajax({
+                url:"{{url_for('book.update_per', index_id='indexid', book_id=book_info._id)}}".replace("indexid",index_id),
+                cache:false,
+                dataType:"JSON",
+                type:"post",
+                data:{
+                    "per_study":per,
+                    "per_all_study":per_all_study
+                },
+                success : function(data) {
+                    console.log("ok");
+                },
+                error : function(data) {
+                    console.log(data)
+                }
+            });
+        });
+
+    });
+
+</script>
 
 <table class="table">
     <tr>
@@ -18,13 +106,37 @@
         <td>{{book_info.publisher}}</td>
     </tr>
     <tr>
-        <td>{{book_info.publish_date}}</td>
+        <td >{{book_info.publish_date}}</td>
     </tr>
 </table>
+<span id="all-per-study">
+    <b>
+        전체 진행도 : {{book_info.per_all_study}}%
+    </b>
+</span>
+<hr>
 
-<!-- div 안에 슬라이딩이랑 목차까지 다 들어가 있음 -->
 
-<a class="btn btn-primary float-right" href="{{url_for('book.book_modify', member_id=session['id'], book_num=book_info.book_num)}}" >수정</a>
+<br>
+
+{% for index in book_indexes %}
+    <div class="progress-container">
+        <div class="progress depth-{{index.depth}}" style="height: 1.8rem;" >
+            <input type="hidden" class="depth" name="depth" value="{{index.depth}}">
+            <input type="hidden" class="index-id" name="index_id" value="{{index._id}}">
+            <div class="progress-bar" role="progressbar" style="width: {{index.per_study}}%; height: 1.8rem !important;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            </div>
+            <div class="index-str-box">
+                <p class="index-str">{{index.name}}&nbsp;&nbsp;&nbsp;</p>
+                <p class="index-str-r float-right"><span name="per-study" class="per-study">{{index.per_study}}</span>%</p>
+            </div>
+        </div>
+    </div>
+    <br>
+{% endfor %}
+
+<a class="btn btn-primary float-right" href="{{url_for('book.book_modify', member_id=session['id'], book_num=book_info.book_num)}}" >목차 수정</a>
 <br><br>
 <hr>
+
 {% endblock content %}

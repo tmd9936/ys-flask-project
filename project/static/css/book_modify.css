@@ -3,7 +3,7 @@
 }
 
 .index-group {
-    width: 80%;
+    width: 90%;
 }
 
 .depth-0 {
@@ -11,11 +11,11 @@
 }
 
 .depth-1 {
-    margin-left: 10%;
+    margin-left: 5%;
 }
 
 .depth-2 {
-    margin-left: 20%;
+    margin-left: 10%;
 }
 
 #sortable { list-style-type: none; margin: 0; padding: 0; }

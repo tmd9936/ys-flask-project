@@ -14,11 +14,13 @@ def book_list():
 @login_required
 def book_view(book_id):
     book_db = mongo.db.book
+    indexes_db = mongo.db.indexes
+
     book_info = book_db.find_one({"_id":ObjectId(book_id)})
+    
+    book_indexes = indexes_db.find({"member_id":session["id"], "book_id":ObjectId(book_id)}).sort("num")
 
-    print(book_info)
-
-    return render_template("book/view.html", title="책", book_info=book_info)
+    return render_template("book/view.html", title=book_info.get("name"), book_info=book_info, book_indexes=book_indexes)
 
 @books_blueprint.route("/search", methods=["GET"])
 @login_required
@@ -75,16 +77,25 @@ def book_join(book_num):
 
             indexes_data = list()
             for e_idx, index in enumerate(result.get("indexes")):
-                indexes = dict()
-                indexes["book_id"] = book_id
-                indexes["member_id"] = session["id"]
-                indexes["name"] = index
-                indexes["per_study"] = 0
-                indexes["depth"] = 0
-                indexes["num"] = e_idx
-                indexes["latest_date"] = current_utc_time
-                
-                indexes_data.append(indexes)
+                if index != "" and index is not None:
+                    indexes = {
+                        "book_id" : book_id,
+                        "member_id" : session["id"],
+                        "name" : index,
+                        "per_study" : 0,
+                        "depth" : 0,
+                        "num" : e_idx,
+                        "latest_date" : current_utc_time
+                    }
+                    # indexes["book_id"] = book_id
+                    # indexes["member_id"] = session["id"]
+                    # indexes["name"] = index
+                    # indexes["per_study"] = 0
+                    # indexes["depth"] = 0
+                    # indexes["num"] = e_idx
+                    # indexes["latest_date"] = current_utc_time
+                    
+                    indexes_data.append(indexes)
 
             book_indexes_db.insert_many(indexes_data)
 
@@ -123,20 +134,20 @@ def book_modify(member_id, book_num):
             indexes = request.form.getlist('book_index')
 
             for e_idx in range(0, len(indexes)):
-                
                 if index_ids[e_idx] == "" or index_ids[e_idx] is None:
                     current_utc_time = round(datetime.utcnow().timestamp()* 1000)
+                    index_item = {
+                        "book_id" : ObjectId(book_id),
+                        "member_id" : member_id,
+                        "name" : indexes[e_idx],
+                        "per_study" : 0,
+                        "depth" : depthes[e_idx],
+                        "num" : e_idx,
+                        "latest_date": current_utc_time
+                    }
                     
-                    indexes = dict()
-                    indexes["book_id"] = book_id
-                    indexes["member_id"] = member_id
-                    indexes["name"] = indexes[e_idx]
-                    indexes["per_study"] = 0
-                    indexes["depth"] = depthes[e_idx]
-                    indexes["num"] = e_idx
-                    indexes["latest_date"] = current_utc_time
-
-                    indexes_db.insert_one(indexes)
+                    rr = indexes_db.insert_one(index_item)
+                    print(rr.inserted_id)
                 else:
                     indexes_db.update({"_id":ObjectId(index_ids[e_idx])},
                     {"$set": 
@@ -146,11 +157,6 @@ def book_modify(member_id, book_num):
                             "name":indexes[e_idx]
                         }
                     })
-
-
-            # print(depthes)
-            # print(index_ides)
-            # print(indexes)
 
             return redirect(url_for('book.book_view', book_id=book_id))
 
@@ -167,3 +173,30 @@ def delete_index(index_id):
         return resp
     else:
         return jsonify({'error': 'This is not index id'}), 401
+
+@books_blueprint.route("/update/per/study/<index_id>/<book_id>", methods=["POST"])
+@login_required
+def update_per(index_id, book_id):
+    if index_id != "" and index_id is not None and book_id != "" and book_id is not None:
+        per_study = request.form["per_study"]
+        per_all_study = request.form["per_all_study"]
+
+        indexes_db = mongo.db.indexes
+        result = indexes_db.update_one({"_id" : ObjectId(index_id)},
+                            {"$set":
+                                {"per_study" : per_study}
+                            })
+        
+        # TODO : 전체진행도 업데이트
+        book_db = mongo.db.book
+        result = book_db.update_one({"_id": ObjectId(book_id)},
+                        {"$set":
+                            {"per_all_study": per_all_study}
+                        })
+
+        resp = jsonify(success=True)
+        resp.status_code = 201
+
+        return resp
+    else:
+        return jsonify({'error': 'url error'}), 401        
