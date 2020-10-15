@@ -14,6 +14,7 @@
         //console.log(book_id);
         location.href = "{{url_for('book.book_view', book_id='bookid')}}".replace("bookid", book_id);
     }
+
 </script>
 <h1>책장</h1>
 <table class="table">
@@ -31,7 +32,7 @@
             <td>{{book.name}}</td>
             <td>{{book.last_modify | datetime_format}}</td>
             <td>{{book.per_all_study}}%</td>
-            <td><input class="btn btn-danger" type="button" value="삭제"></td>
+            <td><a href="{{url_for('book.delete_book', book_id=book._id)}}" class="btn btn-danger">삭제</a></td>
         </tr>
         {% endfor %}
     </tbody>

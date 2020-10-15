@@ -25,6 +25,12 @@
             //console.log($(id).attr("depth"));
   
             depth = Number($(id).prev().prev().attr("value"));
+
+            let prev_li = $(id+"_li").prev();
+            console.log(prev_li);
+            if (prev_li.length < 1) {
+                console.log('ss');
+            }
             
 
             if (depth >= 2){
@@ -40,7 +46,6 @@
             //console.log($(id).attr("depth"));
             
             depth = Number($(id).prev().prev().attr("value"));
-
 
             if (depth <= 0) {
                 return;
@@ -76,7 +81,7 @@
         }
 
         function create_index() {
-            var item = '<li class="ui-state-default ui-sortable-handle"> \
+            var item = '<li class="ui-state-default ui-sortable-handle" id="index_'+ (load_index_cnt + add_index_cnt) +'_li"> \
                     <div class="input-group index-group">\
                         <input type="hidden" class="depth" name="depth" value="0">\
                         <input type="hidden" class="index-id" name="index_id" value="">\
@@ -139,7 +144,7 @@
         
         <ul id="sortable">
             {% for index in book_indexes %}
-                <li class="ui-state-default">
+                <li class="ui-state-default" id="index_{{index.num}}_li">
                     <div class="input-group index-group">
                         <input type="hidden" class="depth" name="depth" value="{{index.depth}}">
                         <input type="hidden" class="index-id" name="index_id" value="{{index._id}}">

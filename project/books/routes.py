@@ -200,3 +200,21 @@ def update_per(index_id, book_id):
         return resp
     else:
         return jsonify({'error': 'url error'}), 401        
+
+@books_blueprint.route("/delete/book/<book_id>", methods=["GET"])
+@login_required
+def delete_book(book_id):
+    if book_id != "" and book_id is not None:
+        member_id = session["id"]
+        indexes_db = mongo.db.indexes
+        book_db = mongo.db.book
+
+        indexes_db.delete_many({"book_id":ObjectId(book_id)})
+
+        book_db.delete_one({"_id":ObjectId(book_id)})
+
+        return redirect(url_for("book.book_list"))
+    else:
+        return jsonify({"error":"url argument error"}), 401
+
+
