@@ -29,11 +29,11 @@
             let prev_li = $(id+"_li").prev();
             console.log(prev_li);
             if (prev_li.length < 1) {
-                console.log('ss');
+                return;
             }
             
 
-            if (depth >= 2){
+            if (depth >= 1){
                 return;
             } else {
                 $(id).removeClass("depth-"+depth);
@@ -144,7 +144,7 @@
         
         <ul id="sortable">
             {% for index in book_indexes %}
-                <li class="ui-state-default" id="index_{{index.num}}_li">
+                <li class="ui-state-default ui-sortable-handle" id="index_{{index.num}}_li">
                     <div class="input-group index-group">
                         <input type="hidden" class="depth" name="depth" value="{{index.depth}}">
                         <input type="hidden" class="index-id" name="index_id" value="{{index._id}}">

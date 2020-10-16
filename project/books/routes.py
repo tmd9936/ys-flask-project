@@ -1,6 +1,7 @@
 from . import *
 from .crawl_yes24 import search_book, crwal_index
 from datetime import datetime
+import math
 
 @books_blueprint.route("/list", methods=["GET"])
 @login_required
@@ -81,6 +82,7 @@ def book_join(book_num):
                     indexes = {
                         "book_id" : book_id,
                         "member_id" : session["id"],
+                        "p_index_id":"",
                         "name" : index,
                         "per_study" : 0,
                         "depth" : 0,
@@ -139,6 +141,7 @@ def book_modify(member_id, book_num):
                     index_item = {
                         "book_id" : ObjectId(book_id),
                         "member_id" : member_id,
+                        "p_index_id":"",
                         "name" : indexes[e_idx],
                         "per_study" : 0,
                         "depth" : depthes[e_idx],
@@ -187,9 +190,9 @@ def update_per(index_id, book_id):
                                 {"per_study" : per_study}
                             })
         
-        # TODO : 전체진행도 업데이트
         book_db = mongo.db.book
         result = book_db.update_one({"_id": ObjectId(book_id)},
+        
                         {"$set":
                             {"per_all_study": per_all_study}
                         })
@@ -217,4 +220,80 @@ def delete_book(book_id):
     else:
         return jsonify({"error":"url argument error"}), 401
 
+@books_blueprint.route("/test/<book_id>", methods=["GET"])
+@login_required
+def set_index_per(book_id):
+    indexes_db = mongo.db.indexes
+    indexes = indexes_db.find({"book_id":ObjectId(book_id)})
+    parent_id = ""
 
+    index_li = list()
+
+    # for index in indexes:
+    #     idx_id = index.get("_id")
+    #     if index.get("depth") == '0':
+    #         parent_id = idx_id
+    #     else:
+    #         indexes_db.update_one({"_id":ObjectId(idx_id)},
+    #             {"$set": 
+    #                 {
+    #                     "p_index_id":parent_id
+    #                 }
+    #             })
+
+    for index in indexes:
+        idx_id = index.get("_id")
+        if index.get("depth") == '0':
+            p_index_id = idx_id
+            index["p_index_id"] = ""
+        else:
+            index["p_index_id"] = p_index_id
+
+        index_li.append(index)
+
+
+    for i in range(0, len(index_li)):
+        depth = index_li[i].get("depth")
+        j = i+1
+        sum_per = 0
+        child_cnt = 0
+
+        if depth == '0':
+
+            while (j != len(index_li) and index_li[j].get("depth") != '0'):
+                sum_per += int(index_li[j].get("per_study"))
+                child_cnt += 1
+                j += 1
+            
+            if child_cnt > 0:
+                per_study = math.floor(sum_per/child_cnt)
+
+                indexes_db.update_one({"_id":index_li[i].get("_id")},
+                    {"$set": 
+                        {
+                            "per_study":per_study
+                        }
+                    })
+            else:
+                continue
+
+
+            
+        else:
+            indexes_db.update_one({"_id":index_li[i].get("_id")},
+                {"$set": 
+                    {
+                        "p_index_id":index_li[i].get("p_index_id")
+                    }
+                })
+
+            
+
+        
+
+
+
+
+    return redirect(url_for("book.book_view", book_id=book_id))
+
+    

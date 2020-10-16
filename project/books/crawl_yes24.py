@@ -81,6 +81,7 @@ def crwal_index(book_num):
 
     image = IMAGE_URL + str(book_num) + IMAGE_SIZE_URL
     name = bs.select_one(".gd_titArea .gd_name").text
+    name = name.replace("<br>","").rstrip()
     auth = bs.select_one(".gd_pubArea .gd_auth").text.strip()
     publisher = bs.select_one(".gd_pubArea .gd_pub").text.strip()
     date = bs.select_one(".gd_pubArea .gd_date").text.strip()

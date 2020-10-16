@@ -34,7 +34,72 @@
 <script>
     $(document).ready(function(){
 
+        // $(".progress").on("click", function(e) {
+        //     // 내가 클릭한 곳의 X좌표
+        //     let startX = e.clientX;
+
+        //     // 해당 돔의 길이
+        //     let dom_width = $(this).innerWidth();
+
+        //     // 해당 돔의 왼쪽 좌표
+        //     let dom_position = $(this).position().left;
+
+        //     let depth = $(this).children("[name='depth']").val();
+        //     let click_position = (startX-dom_position);
+        //     let m_left = $(this).css("margin-left");
+        //     m_left = Number(m_left.replace("px", ""));
+
+        //     if (depth !='0')
+        //         click_position -= m_left;
+        //     let per = Math.round(click_position / dom_width *100);
+            
+        //     // 프로그래스바 길이 조정
+        //     $(this).children('.progress-bar').css("width", per+"%");
+        //     // 선택된 목차의 퍼센트 값 조정
+        //     $(this).children('.index-str-box').children('.index-str-r')
+        //                             .children('.per-study').text(Math.round(per));
+
+        //     // 전체 진행도 계산
+        //     let pers = $("[name='per-study']");
+        //     let sum_per = 0;
+        //     for (const per of pers) {
+        //         sum_per += Number($(per).text());
+                
+        //     }
+
+        //     let index_id = $(this).children('.index-id').val();
+        //     let per_all_study = Math.round(sum_per/pers.length)
+            
+        //     // 전체 진행도 표시
+        //     $("#all-per-study").html("<b>전체 진행도 : " + per_all_study + "%</b>");
+        //     $.ajax({
+        //         url:"{{url_for('book.update_per', index_id='indexid', book_id=book_info._id)}}".replace("indexid",index_id),
+        //         cache:false,
+        //         dataType:"JSON",
+        //         type:"post",
+        //         data:{
+        //             "per_study":per,
+        //             "per_all_study":per_all_study
+        //         },
+        //         success : function(data) {
+        //             console.log("ok");
+        //         },
+        //         error : function(data) {
+        //             console.log(data)
+        //         }
+        //     });
+        // });
+
         $(".progress").on("click", function(e) {
+            let depth = $(this).children("[name='depth']").val();
+            
+            let next_dept = $(this).parent().next()
+                            .children(".progress").children("[name='depth']").val();
+            
+            if(depth == 0 && next_dept == 1){
+                return;
+            }
+
             // 내가 클릭한 곳의 X좌표
             let startX = e.clientX;
 
@@ -44,7 +109,6 @@
             // 해당 돔의 왼쪽 좌표
             let dom_position = $(this).position().left;
 
-            let depth = $(this).children("[name='depth']").val();
             let click_position = (startX-dom_position);
             let m_left = $(this).css("margin-left");
             m_left = Number(m_left.replace("px", ""));
@@ -61,14 +125,21 @@
 
             // 전체 진행도 계산
             let pers = $("[name='per-study']");
+            let depths = $("[name='depth']");
+            let zero_dept_cnt = 0;
             let sum_per = 0;
-            for (const per of pers) {
-                sum_per += Number($(per).text());
-                
+
+            for (let i = 0; i<pers.length; i++)
+            {
+                if(Number($(depths[i]).val()) == 0)
+                {
+                    sum_per += Number($(pers[i]).text());
+                    zero_dept_cnt++;
+                }
             }
 
             let index_id = $(this).children('.index-id').val();
-            let per_all_study = Math.round(sum_per/pers.length)
+            let per_all_study = Math.round(sum_per/zero_dept_cnt)
             
             // 전체 진행도 표시
             $("#all-per-study").html("<b>전체 진행도 : " + per_all_study + "%</b>");
@@ -115,6 +186,7 @@
     </b>
 </span>
 <hr>
+<a class="btn btn-primary" href="{{url_for('book.set_index_per', book_id=book_info._id)}}">test</a>
 
 
 <br>
@@ -131,8 +203,8 @@
                 <p class="index-str-r float-right"><span name="per-study" class="per-study">{{index.per_study}}</span>%</p>
             </div>
         </div>
+        <br>
     </div>
-    <br>
 {% endfor %}
 
 <a class="btn btn-primary float-right" href="{{url_for('book.book_modify', member_id=session['id'], book_num=book_info.book_num)}}" >목차 수정</a>
