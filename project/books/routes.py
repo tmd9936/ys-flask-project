@@ -50,11 +50,11 @@ def book_join(book_num):
 
             book_db = mongo.db.book
 
-            # is_chk = book_db.find_one({"member_id":session["id"], "book_num":book_num})
+            is_chk = book_db.find_one({"member_id":session["id"], "book_num":book_num})
 
-            # if is_chk is not None:
-            #     flash("이미 등록되어있는 책입니다.")
-            #     return redirect(url_for("book.book_search"))
+            if is_chk is not None:
+                flash("이미 등록되어있는 책입니다.")
+                return redirect(url_for("book.book_search"))
 
 
             current_utc_time = round(datetime.utcnow().timestamp()* 1000)
@@ -89,13 +89,6 @@ def book_join(book_num):
                         "num" : e_idx,
                         "latest_date" : current_utc_time
                     }
-                    # indexes["book_id"] = book_id
-                    # indexes["member_id"] = session["id"]
-                    # indexes["name"] = index
-                    # indexes["per_study"] = 0
-                    # indexes["depth"] = 0
-                    # indexes["num"] = e_idx
-                    # indexes["latest_date"] = current_utc_time
                     
                     indexes_data.append(indexes)
 
@@ -118,8 +111,6 @@ def book_modify(member_id, book_num):
         if request.method == "GET":
             book_db = mongo.db.book
             indexes_db = mongo.db.indexes
-
-            # print(member_id, book_num)
 
             book_info = book_db.find_one({"member_id":member_id, "book_num":book_num})
             book_id = book_info.get("_id")
@@ -160,6 +151,8 @@ def book_modify(member_id, book_num):
                             "name":indexes[e_idx]
                         }
                     })
+            
+            __set_index_per(book_id) 
 
             return redirect(url_for('book.book_view', book_id=book_id))
 
@@ -197,6 +190,8 @@ def update_per(index_id, book_id):
                             {"per_all_study": per_all_study}
                         })
 
+        __set_index_per(book_id)                
+
         resp = jsonify(success=True)
         resp.status_code = 201
 
@@ -208,7 +203,6 @@ def update_per(index_id, book_id):
 @login_required
 def delete_book(book_id):
     if book_id != "" and book_id is not None:
-        member_id = session["id"]
         indexes_db = mongo.db.indexes
         book_db = mongo.db.book
 
@@ -220,26 +214,12 @@ def delete_book(book_id):
     else:
         return jsonify({"error":"url argument error"}), 401
 
-@books_blueprint.route("/test/<book_id>", methods=["GET"])
-@login_required
-def set_index_per(book_id):
+
+def __set_index_per(book_id):
     indexes_db = mongo.db.indexes
     indexes = indexes_db.find({"book_id":ObjectId(book_id)})
-    parent_id = ""
 
     index_li = list()
-
-    # for index in indexes:
-    #     idx_id = index.get("_id")
-    #     if index.get("depth") == '0':
-    #         parent_id = idx_id
-    #     else:
-    #         indexes_db.update_one({"_id":ObjectId(idx_id)},
-    #             {"$set": 
-    #                 {
-    #                     "p_index_id":parent_id
-    #                 }
-    #             })
 
     for index in indexes:
         idx_id = index.get("_id")
@@ -276,9 +256,7 @@ def set_index_per(book_id):
                     })
             else:
                 continue
-
-
-            
+          
         else:
             indexes_db.update_one({"_id":index_li[i].get("_id")},
                 {"$set": 
@@ -286,14 +264,3 @@ def set_index_per(book_id):
                         "p_index_id":index_li[i].get("p_index_id")
                     }
                 })
-
-            
-
-        
-
-
-
-
-    return redirect(url_for("book.book_view", book_id=book_id))
-
-    
