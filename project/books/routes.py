@@ -141,7 +141,6 @@ def book_modify(member_id, book_num):
                     }
                     
                     rr = indexes_db.insert_one(index_item)
-                    print(rr.inserted_id)
                 else:
                     indexes_db.update({"_id":ObjectId(index_ids[e_idx])},
                     {"$set": 
@@ -177,17 +176,25 @@ def update_per(index_id, book_id):
         per_study = request.form["per_study"]
         per_all_study = request.form["per_all_study"]
 
+        current_utc_time = round(datetime.utcnow().timestamp() * 1000)
+
         indexes_db = mongo.db.indexes
         result = indexes_db.update_one({"_id" : ObjectId(index_id)},
                             {"$set":
-                                {"per_study" : per_study}
+                                {
+                                    "per_study" : per_study,
+                                    "latest_date" : current_utc_time
+                                }
                             })
         
         book_db = mongo.db.book
         result = book_db.update_one({"_id": ObjectId(book_id)},
-        
                         {"$set":
-                            {"per_all_study": per_all_study}
+                            {
+                                "per_all_study": per_all_study,
+                                "last_modify" : current_utc_time
+
+                            }
                         })
 
         __set_index_per(book_id)                
@@ -217,7 +224,7 @@ def delete_book(book_id):
 
 def __set_index_per(book_id):
     indexes_db = mongo.db.indexes
-    indexes = indexes_db.find({"book_id":ObjectId(book_id)})
+    indexes = indexes_db.find({"book_id":ObjectId(book_id)}).sort("num")
 
     index_li = list()
 
@@ -244,23 +251,30 @@ def __set_index_per(book_id):
                 sum_per += int(index_li[j].get("per_study"))
                 child_cnt += 1
                 j += 1
-            
+                         
             if child_cnt > 0:
                 per_study = math.floor(sum_per/child_cnt)
 
                 indexes_db.update_one({"_id":index_li[i].get("_id")},
                     {"$set": 
                         {
+                            "num":i,
                             "per_study":per_study
                         }
                     })
             else:
-                continue
+                indexes_db.update_one({"_id":index_li[i].get("_id")},
+                    {"$set": 
+                        {
+                            "num":i
+                        }
+                    })                
           
         else:
             indexes_db.update_one({"_id":index_li[i].get("_id")},
                 {"$set": 
                     {
+                        "num":i,
                         "p_index_id":index_li[i].get("p_index_id")
                     }
                 })
