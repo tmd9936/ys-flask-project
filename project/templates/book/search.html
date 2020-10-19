@@ -22,6 +22,15 @@
         search();
     }
 
+    $(document).ready(function() {
+        $("#search_str").keydown(function(key) {
+            if(key.keyCode == 13) {
+                click_search_btn();
+            }
+        });
+    });
+
+
     // setTimeout(search, 5000)
     function get_book_list() {
         let scroll_position = Math.floor(($(window).scrollTop() / ($(document).height() - $(window).height())) * 100);
