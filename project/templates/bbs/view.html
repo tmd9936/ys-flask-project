@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="blog-post">
+    <h3 class="pb-4 mb-4 bbs-title">
+        게시판 - 글 상세보기
+    </h3>
+</div><!-- /.blog-post -->
+<div class="container">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td colspan="2">제목 : {{result.title}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">글쓴이 : {{result.name}}</td>
+            </tr>
+            <tr>
+                <td>작성일 : {{result.regdate | datetime_format}}</td>
+                <td>조회수 : {{result.hit}}</td>
+            </tr>
+            {% if result.attachFile %}
+            <tr>
+                <td colspan="2">첨부파일 : <a href="{{url_for('board.board_files', filename=result.attachFile)}}">{{result.attachFile}}</a></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="border-top-0" colspan="2" style="height: 300px;">{% autoescape false %}{{result.contents}}{% endautoescape %}</td>
+            </tr>
+        </tbody>
+    </table>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                alert("{{messages[-1]}}"); // 리스트의 맨마지막 값이 message
+            </script>
+        {% endif %}
+    {% endwith %}
+        
+    <p></p>
+    <p>
+        <a class="btn btn-primary btn-success" href="{{url_for('board.list', keyword=keyword, search=search, page=page)}}">리스트</a>
+    </p>
+    {% if session['id'] == result.writer_id %}
+        <a class="btn btn-danger float-right ml-2" href="{{url_for('board.board_modify', idx=result.id)}}">글수정</a>
+        <a class="btn btn-primary float-right" href="{{url_for('board.board_delete', idx=result.id)}}">글삭제</a>
+    {% endif %}
+
+    <br>
+
+    {% if prev_board_id %}
+        <a class="btn" href="{{url_for('board.board_view', idx=prev_board_id)}}">이전글</a>
+    {% else %}
+        <a class="btn disabled" href="#">이전글</a>
+    {% endif %}
+
+    {% if next_board_id %}
+        <a class="btn" href="{{url_for('board.board_view', idx=next_board_id)}}">다음글</a>
+    {% else %}
+        <a class="btn disabled" href="#">다음글</a>
+    {% endif %}
+</div>
+{% endblock content %}

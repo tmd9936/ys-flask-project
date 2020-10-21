@@ -22,15 +22,14 @@
           <li class="nav-item">
             <a class="nav-link color-red" href="{{url_for('book.book_search')}}">검색</a>
           </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="">검색</a>
-          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('board.list')}}">게시판</a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="dropdown07XL" data-toggle="dropdown" aria-expanded="false">사용자</a>
             <div class="dropdown-menu" aria-labelledby="dropdown07XL">
               {% if session["id"] %}
                 <a class="dropdown-item" href="#">나의 프로필</a>
-                <a class="dropdown-item" href="#">주문내역</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{{url_for('member.logout')}}">로그아웃</a>
               {% else %}

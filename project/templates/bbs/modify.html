@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        $("#customFile").on("change", function() {
+            console.log("asfdsdaf");
+            let fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+    });
+</script>
+<div class="blog-post">
+    <h3 class="pb-4 mb-4 bbs-title">
+        게시판 - 글수정
+    </h3>
+</div><!-- /.blog-post -->
+<form action="{{url_for('board.board_modify', idx=data._id)}}" method="POST" name="form" onsubmit="return chk_form()" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="name" >글쓴이</label>
+        <input class="form-control" type="text" name="name" size="28" value="{{session['name']}}" id="name" readonly>
+    </div>
+    <div class="form-group">
+        <label for="title">제목</label>
+        <input class="form-control" type="text" name="title" size="28" id="title" value="{{data.title}}" placeholder="제목을 입력하세요">
+    </div>
+    {% if data.attachFile %}
+    <div class="form-check text-right">
+        <input type="checkbox" class="form-check-input" id="delOldFile" name="delOldFile">
+        <label for="delOldFile">파일삭제 {{data.attachFile}}</label>
+    </div>
+    {% endif %}
+
+
+    <div class="form-group">
+        <label for="contents">내용</label>
+        <textarea class="form-control" name="contents" cols="30" rows="10" id="summernote"  placeholder="내용을 입력하세요">{{data.contents}}</textarea>
+    </div>
+    <div class="col-md-6 custom-file"> 
+        <input type="file" class="custom-file-input" id="customFile" name="attachFile" >
+        <label class="custom-file-label" for="customFile">파일 선택</label>
+    </div>
+    <div class="text-left">
+
+        <input class="btn btn-primary" type="submit" value="수정">
+        
+    </div>
+    <br>
+</form>
+
+{% endblock content %}

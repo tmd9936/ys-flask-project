@@ -77,7 +77,7 @@ def crwal_index(book_num):
 
     for content in indexes.contents:
         if str(content).find("<br/>") == -1:
-            index_list.append(str(content).strip())
+            index_list.append(str(content).replace("<b>","").replace("</b>","").strip())
 
     image = IMAGE_URL + str(book_num) + IMAGE_SIZE_URL
     name = bs.select_one(".gd_titArea .gd_name").text

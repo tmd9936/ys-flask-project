@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.8/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.8/summernote.js"></script> -->
+
+<script>
+    $(document).ready(function(){
+        $("#customFile").on("change", function() {
+            console.log("asfdsdaf");
+            let fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+    });
+</script>
+
+<div class="blog-post">
+    <h3 class="pb-4 mb-4 bbs-title">
+        게시판 - 글쓰기
+    </h3>
+</div><!-- /.blog-post -->
+<form action="{{url_for('board.board_write')}}" method="POST" name="form" onsubmit="return chk_form()" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="name" >글쓴이</label>
+        <input class="form-control" type="text" name="name" size="28" value="{{session['name']}}" id="name" readonly>
+    </div>
+    <div class="form-group">
+        <label for="title">제목</label>
+        <input class="form-control" type="text" name="title" size="28" id="title" placeholder="제목을 입력하세요">
+    </div>
+    <!-- <div class="form-group">
+        <label for="contents">내용</label>
+        <textarea class="form-control" name="contents" cols="30" rows="10" id="contents" placeholder="내용을 입력하세요"></textarea> -->
+        <!-- <div id="contents" class="form-control" name="contents" id="contents" ></div>  -->
+    <!-- </div> -->
+    <div class="form-group">
+        <label for="contents">내용</label>
+        <textarea class="form-control" name="contents" cols="30" rows="10" id="summernote" placeholder="내용을 입력하세요" ></textarea>
+    </div>
+
+    <br>
+    <div class="col-md-6 custom-file"> 
+        <input type="file" class="custom-file-input" id="customFile" name="attachFile">
+        <label class="custom-file-label" for="customFile">파일 선택</label>
+    </div>
+    <br><br>
+
+    <div class="text-left">
+        <input class="btn btn-primary" type="submit" value="등록">
+    </div>
+
+    <br>
+</form>
+{% endblock content %}
