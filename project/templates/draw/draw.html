@@ -6,6 +6,10 @@
         .colors {
             display: flex;
         }
+        #myCanvas {
+            border: 1px solid black;
+            background: powderblue;
+        }
     </style>
     
     <script type="text/javascript" charset="utf-8">
@@ -49,14 +53,19 @@
             });
 
             var canvas, context;
+            var color;
 
-            var line_list = [];
-
+            
             canvas = document.getElementById("myCanvas");
             context = canvas.getContext("2d");
             
+            context.fillStyle = '#ffffff';
+            context.fillRect(0,0,window.innerWidth,window.innerHeight);
+
+            var line_list = [];
             
             context.lineWidth = 2; // 선 굵기를 2로 설정
+            color = "blue"
             context.strokeStyle = "blue";
 
             canvas.addEventListener("mousemove", function (e) {
@@ -89,13 +98,24 @@
                     startX:startX,
                     startY:startY,
                     curX:curX,
-                    curY:curY
+                    curY:curY,
+                    color:color
 
                 });
 
             }
 
             socket.on('draw response', function(msg) {
+                
+                context.strokeStyle = msg.color;
+                if (msg.color === "white")
+                {
+                    context.lineWidth = 10; 
+                }
+                else
+                {
+                    context.lineWidth = 2; 
+                }
                 
                 context.beginPath();
                 context.moveTo(msg.startX, msg.startY);
@@ -128,10 +148,21 @@
                 drawing = false;
             }
             
+            $('.colorChange-btn').click(function(e) {
+                color_attr = $(this).attr('color');
+                if (color_attr === "white")
+                {
+                    context.lineWidth = 10; 
+                }
+                else
+                {
+                    context.lineWidth = 2; 
+                }
+                color = color_attr
+                context.strokeStyle = color_attr;
+            })
+            
         });
-
-
-
     </script>
 
     <h1>Received</h1>
@@ -141,7 +172,7 @@
     </div>
 
     <form action="broadcast" action="#" method="POST">
-        <input type="text" class="username" style="font-size:15px;" placeholder="username"/>
+        <input type="text" class="username" style="font-size:15px;" value="{{session['email']}}" readonly/>
         <input type="text" class="message" style='font-size:15px;' placeholder="Messages"/>
         <input type="submit" value="submit"/>
     </form>
@@ -150,11 +181,11 @@
         
     </canvas>
     <div class="colors">
-        <input type="button" class="btn btn-primary" value="&nbsp;&nbsp;">
-        <input type="button" class="btn btn-danger" value="&nbsp;&nbsp;">
-        <input type="button" class="btn btn-success" value="&nbsp;&nbsp;">
-        <input type="button" class="btn btn-warning" value="&nbsp;&nbsp;">
-        <input type="button" class="btn btn-dark" value="&nbsp;&nbsp;">
-        <input type="button" class="btn btn-light" value="지우개">
+        <input type="button" class="btn btn-primary colorChange-btn" color="blue" value="&nbsp;&nbsp;">  <!--파랑-->
+        <input type="button" class="btn btn-danger colorChange-btn" color="red" value="&nbsp;&nbsp;">   <!--빨강-->
+        <input type="button" class="btn btn-success colorChange-btn" color="green" value="&nbsp;&nbsp;">  <!--초록-->
+        <input type="button" class="btn btn-warning colorChange-btn" color="yellow" value="&nbsp;&nbsp;">  <!--노랑-->
+        <input type="button" class="btn btn-dark colorChange-btn" color="black" value="&nbsp;&nbsp;">     <!--검정-->
+        <input type="button" class="btn btn-light colorChange-btn" color="white" value="지우개">
     </div>
 {% endblock content %}
