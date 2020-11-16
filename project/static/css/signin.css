@@ -53,3 +53,19 @@ div.login-form, div.join-form {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.profil-image {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background-size: 24px 24px;
+}
+.profil-image-div {
+  width: 100%;
+  align-items: center;
+  text-align: center;
+}
+
+.profil-image:hover{
+  cursor: pointer;
+}

@@ -81,6 +81,42 @@ def member_login():
         return render_template("member/login.html", title="로그인")
 
 
+@members_blueprint.route("/modify", methods=["GET","POST"])
+def member_modify():
+    if request.method == "post":
+        name = request.form.get('name')
+        pw = request.form.get('pw')
+        pw2 = request.form.get('pw2')
+
+        if name == "" or pw == "" or pw2 == "":
+            flash("빈 값이 있습니다.")
+            return render_template("member/modify.html", title="회원수정")
+        
+        if pw != pw2:
+            flash("비밀번호가 다릅니다.")
+            return render_template("member/modify.html", title="회원수정")
+        
+        if session["email"] == None or session["email"] == "":
+            flash("로그인 하세요")
+            return redirect(url_for("member.member_login"))
+
+        members = mongo.db.members
+        members.update_one({"_id":session["id"]},
+                            {"$set":
+                                {
+                                    "name":name,
+                                    "pw":pw    
+                                }
+                            })
+        
+        return render_template("member/modify.html", title="회원수정")
+
+    else:
+        return render_template("member/modify.html",title="회원수정")
+
+    
+
+
 @members_blueprint.route("/logout", methods=['GET'])
 def logout():
     session.clear()

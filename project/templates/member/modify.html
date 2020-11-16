@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <script>
+        alert("{{messages[-1]}}");
+    </script>
+{% endif %}
+{% endwith %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/signin.css')}}"> 
+<script>
+    function join_chk_form()
+    {
+        if($.trim($("#name").val()) == ""){
+            alert("이름을 입력하세요.");
+            $("#name").focus();
+            return false;
+        }
+        if($.trim($("#pw").val()) == ""){
+            alert("비밀번호를 입력하세요.");
+            $("#pw").focus();
+            return false;
+        }
+        if($.trim($("#pw2").val()) == ""){
+            alert("비밀번호를 입력하세요.");
+            $("#pw2").focus();
+            return false;
+        }
+        if($.trim($("#pw").val()) != $.trim($("#pw2").val())){
+            alert("비밀번호가 일치하지 않습니다.")
+            $("#pw2").select().focus();
+            return false;
+        }        
+    }
+</script>
+
+<div class="join-form">
+    <form class="form-join" action="{{url_for('member.member_modify')}}" method="POST" name="form" onsubmit="return join_chk_form()">
+        <h1 class="text-center">회원수정</h1>
+        <div class="profil-image-div">
+            <img class="profil-image" src="{{url_for('static', filename='images/man.png')}}" alt="">
+        </div>
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input class="form-control" type="text" name="name" id="name" value="{{session['name']}}">
+        </div>
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input class="form-control" type="text" name="email" id="email" value="{{session['email']}}" readonly>
+        </div>
+        <div class="form-group">
+            <label for="pw">비밀번호</label>
+            <input class="form-control" type="password" name="pw" id="pw">
+        </div>
+        <div class="form-group">
+            <label for="pw2">비밀번호 확인</label>
+            <input class="form-control" type="password" name="pw2" id="pw2">
+        </div>
+        <br>
+        <div class="text-center"><input type="submit" value="정보수정" class="btn btn-primary"></div>
+    </form>
+</div>
+{% endblock content %}
