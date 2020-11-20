@@ -6,7 +6,6 @@
 <script>
     $(document).ready(function(){
         $("#customFile").on("change", function() {
-            console.log("asfdsdaf");
             let fileName = $(this).val().split("\\").pop();
             $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
         });

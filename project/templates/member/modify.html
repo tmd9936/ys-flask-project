@@ -33,13 +33,19 @@
             return false;
         }        
     }
+
+    // $(document).ready(function() {
+    //     $('.profil-image').click(function(params) {
+           
+    //     });
+    // });
 </script>
 
 <div class="join-form">
     <form class="form-join" action="{{url_for('member.member_modify')}}" method="POST" name="form" onsubmit="return join_chk_form()">
         <h1 class="text-center">회원수정</h1>
         <div class="profil-image-div">
-            <img class="profil-image" src="{{url_for('static', filename='images/man.png')}}" alt="">
+            <img class="profil-image" src="{{url_for('static', filename='images/man.png')}}" alt="" data-toggle="modal" data-target="#profil-image-madal">
         </div>
         <div class="form-group">
             <label for="name">이름</label>
@@ -61,4 +67,26 @@
         <div class="text-center"><input type="submit" value="정보수정" class="btn btn-primary"></div>
     </form>
 </div>
+<div class="modal fade" id="profil-image-madal" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">프로필 수정</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="custom-file"> 
+                <input type="file" class="custom-file-input" id="customFile" name="attachFile">
+                <label class="custom-file-label" for="customFile">파일 선택</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}

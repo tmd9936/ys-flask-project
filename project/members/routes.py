@@ -83,7 +83,7 @@ def member_login():
 
 @members_blueprint.route("/modify", methods=["GET","POST"])
 def member_modify():
-    if request.method == "post":
+    if request.method == "POST":
         name = request.form.get('name')
         pw = request.form.get('pw')
         pw2 = request.form.get('pw2')
@@ -101,7 +101,8 @@ def member_modify():
             return redirect(url_for("member.member_login"))
 
         members = mongo.db.members
-        members.update_one({"_id":session["id"]},
+
+        up = members.update({"_id":ObjectId(session["id"])},
                             {"$set":
                                 {
                                     "name":name,
@@ -109,12 +110,12 @@ def member_modify():
                                 }
                             })
         
+        session["name"] = name
         return render_template("member/modify.html", title="회원수정")
 
     else:
         return render_template("member/modify.html",title="회원수정")
 
-    
 
 
 @members_blueprint.route("/logout", methods=['GET'])
